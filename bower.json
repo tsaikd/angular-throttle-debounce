@@ -1,0 +1,31 @@
+{
+  "name": "angular-throttle-debounce",
+  "version": "0.0.1",
+  "homepage": "https://github.com/tsaikd/angular-throttle-debounce",
+  "description": "AngularJS throttle debounce module",
+  "keywords": [
+    "angular",
+    "throttle"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "angular": ">=1.3"
+  },
+  "devDependencies": {
+    "angular-mocks": ">=1.3"
+  },
+  "main": [
+    "dist/angular-throttle.min.js"
+  ],
+  "ignore": [
+    "node_modules",
+    "lib",
+    "src",
+    "gulpfile.js",
+    "karma.config.js",
+    "package.json"
+  ],
+  "authors": [
+    "tsaikd <tsaikd@gmail.com>"
+  ]
+}
