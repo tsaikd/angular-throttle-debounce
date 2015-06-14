@@ -7,6 +7,11 @@ AngularJS throttle debounce module
 
 ## Usage
 
+* Install javascript files from bower or download manually
+```sh
+bower install --save angular-throttle-debounce
+```
+
 * Include javascript files in your application
 	* `angular.js`
 	* `angular-throttle-debounce.js`
