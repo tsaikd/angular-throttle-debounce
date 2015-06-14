@@ -18,6 +18,8 @@ var gulp = require("gulp"),
 
 gulp.task("default", ["build"]);
 
+gulp.task("dev", ["watch"]);
+
 gulp.task("up", ["update-npm", "update-bower"]);
 
 gulp.task("build", function(done) {
@@ -97,4 +99,16 @@ gulp.task("update-bower", function(done) {
 	}
 	cmd = "bower install --save --force-latest " + deps.join(" ");
 	$.run(cmd).exec().on("end", done);
+});
+
+gulp.task("watch", function() {
+	gulp.watch(["src/**", "example/**"], function(info) {
+		gulp.src(info.path)
+			.pipe($.connect.reload());
+	});
+	$.connect.server({
+		root: "./",
+		port: 9000,
+		livereload: true
+	});
 });

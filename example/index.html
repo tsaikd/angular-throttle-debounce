@@ -1,0 +1,58 @@
+<!doctype html>
+<html ng-app="myApp">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Angular-throttle example</title>
+		<style type="text/css">
+.success {
+	background: lightgreen;
+}
+.failed {
+	background: pink;
+}
+		</style>
+	</head>
+	<body>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular.js"></script>
+		<script src="../src/throttle.js"></script>
+
+		<script src="index.js"></script>
+
+		<div ng-controller="indexCtrl">
+			<div style="display: inline-block;">
+				<h2 style="text-align: center;">Throttle</h2>
+				<table style="text-align: center;">
+					<tr>
+						<td>Actual</td>
+						<td>Expect</td>
+						<td>Test Result</td>
+					</tr>
+					<tr ng-repeat="res in throttleResultArray track by $index"
+						ng-class="{'success': (res[0] === res[1]), 'failed': (res[0] !== res[1])}">
+						<td>{{res[0]}}</td>
+						<td>{{res[1]}}</td>
+						<td ng-if="res[0] === res[1]">Success</td>
+						<td ng-if="res[0] !== res[1]">Failed</td>
+					</tr>
+				</table>
+			</div>
+			<div style="display: inline-block; margin-left: 2em;">
+				<h2 style="text-align: center;">Debounce</h2>
+				<table style="text-align: center;">
+					<tr>
+						<td>Actual</td>
+						<td>Expect</td>
+						<td>Test Result</td>
+					</tr>
+					<tr ng-repeat="res in debounceResultArray track by $index"
+						ng-class="{'success': (res[0] === res[1]), 'failed': (res[0] !== res[1])}">
+						<td>{{res[0]}}</td>
+						<td>{{res[1]}}</td>
+						<td ng-if="res[0] === res[1]">Success</td>
+						<td ng-if="res[0] !== res[1]">Failed</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>
