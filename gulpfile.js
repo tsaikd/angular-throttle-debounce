@@ -24,7 +24,7 @@ gulp.task("up", ["update-npm", "update-bower"]);
 
 gulp.task("build", function(done) {
 	runSequence(
-		["version", "bower.json", "jshint"],
+		["version", "bower.json", "jshint", "test"],
 		["js"],
 		done);
 });
