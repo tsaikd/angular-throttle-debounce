@@ -10,108 +10,212 @@ var app = angular.module("myApp", [
 	$scope.throttleTrailingResultArray = [];
 	$scope.debounceResultArray = [];
 
-	(function(resultArray) {
-		var count = 0;
-		var fn = throttle(function() {
-			count++;
-		}, 1000);
+	function genExpect(resultArray) {
+		var expect = function(value) {
+			this.resultArray = resultArray;
+			this.value = value;
+			return this;
+		};
+		expect.toEqual = function(expectValue) {
+			this.resultArray.push([this.value, expectValue]);
+			return this;
+		};
+		return expect.bind(expect);
+	}
 
-		// count === 0
-		resultArray.push([count, 0]);
+	function genDone(resultArray) {
+		var done = function() {
+			resultArray.push(["end", "end"]);
+			return this;
+		};
+		return done.bind(done);
+	}
 
-		fn(); // count === 1
-		resultArray.push([count, 1]);
-
-		fn(); // count === 1
-		resultArray.push([count, 1]);
-
-		fn(); // count === 1
-		resultArray.push([count, 1]);
-
-		$timeout(function() {
-			// count === 1
-			resultArray.push([count, 1]);
-			fn(); // count === 2
-			resultArray.push([count, 2]);
-
-			$timeout(function() {
-				// count === 2
-				resultArray.push([count, 2]);
-				fn(); // count === 3
-				resultArray.push([count, 3]);
-
-				resultArray.push(["end", "end"]);
-			}, 1100);
-		}, 1100);
-	})($scope.throttleNoTrailingResultArray);
-
-	(function(resultArray) {
-		var count = 0;
-		var fn = throttle(function() {
-			count++;
-		}, 1000, true);
-
-		// count === 0
-		resultArray.push([count, 0]);
-
-		fn(); // count === 1
-		resultArray.push([count, 1]);
-
-		fn(); // count === 1
-		resultArray.push([count, 1]);
-
-		fn(); // count === 1
-		resultArray.push([count, 1]);
+	(function(expect, done) {
+		var delay = 100;
+		var calls = [];
+		var fn = throttle(function(callid) {
+			calls.push(callid);
+		}, delay);
 
 		$timeout(function() {
-			// count === 2
-			resultArray.push([count, 2]);
-			fn(); // count === 3
-			resultArray.push([count, 3]);
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(1).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(2).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(3).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 0);
+		}, 0)
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(4).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(5).finally(function(a, b) {
+					expect(calls.length >= 1).toBeTruthy();
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 0.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(6).finally(function() {
+					expect(calls.length >= 2).toBeTruthy();
+				});
+				expect(calls.length).toEqual(2);
+				fn(7).finally(function() {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(2);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(2);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(2);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(JSON.stringify(calls)).toEqual(JSON.stringify([1, 6]));
+			}, delay * 1);
+		})
+		.finally(done);
+	})(genExpect($scope.throttleNoTrailingResultArray), genDone($scope.throttleNoTrailingResultArray));
 
-			$timeout(function() {
-				// count === 3
-				resultArray.push([count, 3]);
-				fn(); // count === 4
-				resultArray.push([count, 4]);
-
-				resultArray.push(["end", "end"]);
-			}, 1100);
-		}, 1100);
-	})($scope.throttleTrailingResultArray);
-
-	(function(resultArray) {
-		var count = 0;
-		var fn = debounce(function() {
-			count++;
-		}, 1000);
-
-		// count === 0
-		resultArray.push([count, 0]);
-
-		fn(); // count === 0
-		resultArray.push([count, 0]);
-
-		fn(); // count === 0
-		resultArray.push([count, 0]);
-
-		fn(); // count === 0
-		resultArray.push([count, 0]);
+	(function(expect, done) {
+		var delay = 100;
+		var calls = [];
+		var fn = throttle(function(callid) {
+			calls.push(callid);
+		}, delay, true);
 
 		$timeout(function() {
-			// count === 1
-			resultArray.push([count, 1]);
-			fn(); // count === 1
-			resultArray.push([count, 1]);
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(1).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(2).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(3).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 0);
+		}, 0)
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(4).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(5).finally(function(a, b) {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 0.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(6).finally(function() {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(2);
+				fn(7).finally(function() {
+					expect(calls.length).toEqual(3);
+				});
+				expect(calls.length).toEqual(2);
+			}, delay * 0.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(3);
+			}, delay * 1.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(3);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(JSON.stringify(calls)).toEqual(JSON.stringify([1, 6, 7]));
+			}, delay * 1);
+		})
+		.finally(done);
+	})(genExpect($scope.throttleTrailingResultArray), genDone($scope.throttleTrailingResultArray));
 
-			$timeout(function() {
-				fn(); // count === 2
-				resultArray.push([count, 2]);
+	(function(expect, done) {
+		var delay = 100;
+		var calls = [];
+		var fn = debounce(function(callid) {
+			calls.push(callid);
+		}, delay);
 
-				resultArray.push(["end", "end"]);
-			}, 1100);
-		}, 1100);
-	})($scope.debounceResultArray);
+		$timeout(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(1).finally(function() {
+					expect(calls.length).toEqual(0);
+				});
+				expect(calls.length).toEqual(0);
+				fn(2).finally(function() {
+					expect(calls.length).toEqual(0);
+				});
+				expect(calls.length).toEqual(0);
+			}, delay * 0);
+		}, 0)
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(3).finally(function() {
+					expect(calls.length).toEqual(0);
+				});
+				expect(calls.length).toEqual(0);
+				fn(4).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(0);
+			}, delay * 0.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(5).finally(function() {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 1.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(JSON.stringify(calls)).toEqual(JSON.stringify([4, 5]));
+			}, delay * 1.5);
+		})
+		.finally(done);
+	})(genExpect($scope.debounceResultArray), genDone($scope.debounceResultArray));
 
 }])
 

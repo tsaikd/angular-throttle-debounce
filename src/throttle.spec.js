@@ -2,6 +2,7 @@ describe("angular-throttle-debounce unit test", function() {
 
 	var throttle,
 		debounce,
+		$timeout,
 		$browser,
 		$log;
 
@@ -65,6 +66,7 @@ describe("angular-throttle-debounce unit test", function() {
 	beforeEach(inject(function($injector) {
 		$browser = $injector.get("$browser");
 		$log = $injector.get("$log");
+		$timeout = $injector.get("$timeout");
 		throttle = $injector.get("throttle");
 		debounce = $injector.get("debounce");
 		expect(throttle).toBeDefined();
@@ -80,53 +82,65 @@ describe("angular-throttle-debounce unit test", function() {
 			calls.push(callid);
 		}, delay);
 
-		expect(calls.length).toEqual(0);
-		fn(1).finally(function() {
-			expect(calls.length).toEqual(1);
-		});
-		expect(calls.length).toEqual(1);
-		fn(2).finally(function() {
-			expect(calls.length).toEqual(1);
-		});
-		expect(calls.length).toEqual(1);
-		fn(3).finally(function() {
-			expect(calls.length).toEqual(1);
-		});
-		expect(calls.length).toEqual(1);
-
-		setTimeout(function() {
-			expect(calls.length).toEqual(1);
-			fn(4).finally(function() {
+		$timeout(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(1).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
 				expect(calls.length).toEqual(1);
-			});
-			expect(calls.length).toEqual(1);
-			fn(5).finally(function(a, b) {
-				expect(calls.length >= 1).toBeTruthy();
-			});
-			expect(calls.length).toEqual(1);
-		}, delay * 0.75);
-		setTimeout(function() {
-			expect(calls.length).toEqual(1);
-			fn(6).finally(function() {
-				expect(calls.length >= 2).toBeTruthy();
-			});
-			expect(calls.length).toEqual(2);
-			fn(7).finally(function() {
+				fn(2).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(3).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 0);
+		}, 0)
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(4).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(5).finally(function(a, b) {
+					expect(calls.length >= 1).toBeTruthy();
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 0.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(6).finally(function() {
+					expect(calls.length >= 2).toBeTruthy();
+				});
 				expect(calls.length).toEqual(2);
-			});
-			expect(calls.length).toEqual(2);
-		}, delay * 1.25);
-		setTimeout(function() {
-			expect(calls.length).toEqual(2);
-		}, delay * 2);
-		setTimeout(function() {
-			expect(calls.length).toEqual(2);
-		}, delay * 3);
-		setTimeout(function() {
-			expect(calls).toEqual([1, 6]);
-		}, delay * 4);
-
-		setTimeout(done, delay * 4.5);
+				fn(7).finally(function() {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(2);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(2);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(2);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(JSON.stringify(calls)).toEqual(JSON.stringify([1, 6]));
+			}, delay * 1);
+		})
+		.finally(done);
 	});
 
 	it("test throttle function with trailing", function(done) {
@@ -136,53 +150,65 @@ describe("angular-throttle-debounce unit test", function() {
 			calls.push(callid);
 		}, delay, true);
 
-		expect(calls.length).toEqual(0);
-		fn(1).finally(function() {
-			expect(calls.length).toEqual(1);
-		});
-		expect(calls.length).toEqual(1);
-		fn(2).finally(function() {
-			expect(calls.length).toEqual(1);
-		});
-		expect(calls.length).toEqual(1);
-		fn(3).finally(function() {
-			expect(calls.length).toEqual(1);
-		});
-		expect(calls.length).toEqual(1);
-
-		setTimeout(function() {
-			expect(calls.length).toEqual(1);
-			fn(4).finally(function() {
+		$timeout(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(1).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
 				expect(calls.length).toEqual(1);
-			});
-			expect(calls.length).toEqual(1);
-			fn(5).finally(function(a, b) {
-				expect(calls.length >= 1).toBeTruthy();
-			});
-			expect(calls.length).toEqual(1);
-		}, delay * 0.75);
-		setTimeout(function() {
-			expect(calls.length).toEqual(1);
-			fn(6).finally(function() {
-				expect(calls.length >= 2).toBeTruthy();
-			});
-			expect(calls.length).toEqual(2);
-			fn(7).finally(function() {
+				fn(2).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(3).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 0);
+		}, 0)
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(4).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+				fn(5).finally(function(a, b) {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 0.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(6).finally(function() {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(2);
+				fn(7).finally(function() {
+					expect(calls.length).toEqual(3);
+				});
+				expect(calls.length).toEqual(2);
+			}, delay * 0.5);
+		})
+		.then(function() {
+			return $timeout(function() {
 				expect(calls.length).toEqual(3);
-			});
-			expect(calls.length).toEqual(2);
-		}, delay * 1.25);
-		setTimeout(function() {
-			expect(calls.length).toEqual(2);
-		}, delay * 2);
-		setTimeout(function() {
-			expect(calls.length).toEqual(3);
-		}, delay * 3);
-		setTimeout(function() {
-			expect(calls).toEqual([1, 6, 7]);
-		}, delay * 4);
-
-		setTimeout(done, delay * 4.5);
+			}, delay * 1.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(3);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(JSON.stringify(calls)).toEqual(JSON.stringify([1, 6, 7]));
+			}, delay * 1);
+		})
+		.finally(done);
 	});
 
 	it("test debounce function", function(done) {
@@ -192,39 +218,47 @@ describe("angular-throttle-debounce unit test", function() {
 			calls.push(callid);
 		}, delay);
 
-		expect(calls.length).toEqual(0);
-		fn(1).finally(function() {
-			expect(calls.length).toEqual(0);
-		});
-		expect(calls.length).toEqual(0);
-		fn(2).finally(function() {
-			expect(calls.length).toEqual(0);
-		});
-		expect(calls.length).toEqual(0);
-
-		setTimeout(function() {
-			expect(calls.length).toEqual(0);
-			fn(3).finally(function() {
+		$timeout(function() {
+			return $timeout(function() {
 				expect(calls.length).toEqual(0);
-			});
-			expect(calls.length).toEqual(0);
-			fn(4).finally(function() {
+				fn(1).finally(function() {
+					expect(calls.length).toEqual(0);
+				});
+				expect(calls.length).toEqual(0);
+				fn(2).finally(function() {
+					expect(calls.length).toEqual(0);
+				});
+				expect(calls.length).toEqual(0);
+			}, delay * 0);
+		}, 0)
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(3).finally(function() {
+					expect(calls.length).toEqual(0);
+				});
+				expect(calls.length).toEqual(0);
+				fn(4).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(0);
+			}, delay * 0.5);
+		})
+		.then(function() {
+			return $timeout(function() {
 				expect(calls.length).toEqual(1);
-			});
-			expect(calls.length).toEqual(0);
-		}, delay * 0.75);
-		setTimeout(function() {
-			expect(calls.length).toEqual(1);
-			fn(5).finally(function() {
-				expect(calls.length).toEqual(2);
-			});
-			expect(calls.length).toEqual(1);
-		}, delay * 2);
-		setTimeout(function() {
-			expect(calls).toEqual([4, 5]);
-		}, delay * 3.5);
-
-		setTimeout(done, delay * 4);
+				fn(5).finally(function() {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 1.5);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(JSON.stringify(calls)).toEqual(JSON.stringify([4, 5]));
+			}, delay * 1.5);
+		})
+		.finally(done);
 	});
 
 });

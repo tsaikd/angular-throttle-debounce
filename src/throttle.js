@@ -17,21 +17,22 @@ angular
 				args = arguments,
 				context = this;
 
+			$timeout.cancel(deferTimer);
 			if (last && now < (last + threshhold)) {
-				$timeout.cancel(deferTimer);
 				if (trailing) {
 					deferTimer = $timeout(function() {
+						now = +new Date();
 						last = now;
-						callback.apply(context, args);
+						return callback.apply(context, args);
 					}, threshhold);
-				} else {
-					deferTimer = $timeout(function() {}, threshhold);
 				}
 				return deferTimer;
 			} else {
+				var deferred = $q.defer();
 				last = now;
-				callback.apply(context, args);
-				return $timeout(function() {}, 0);
+				deferred.resolve(callback.apply(context, args));
+				deferTimer = deferred.promise;
+				return deferTimer;
 			}
 		};
 	};
