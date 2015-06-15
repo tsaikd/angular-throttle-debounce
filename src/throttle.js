@@ -7,7 +7,7 @@ angular
 .factory("throttle"
 	, [       "$q", "$timeout"
 	, function($q,   $timeout) {
-	return function(callback, threshhold) {
+	return function(callback, threshhold, trailing) {
 		threshhold = threshhold || 250;
 
 		var last, deferTimer;
@@ -19,10 +19,14 @@ angular
 
 			if (last && now < (last + threshhold)) {
 				$timeout.cancel(deferTimer);
-				deferTimer = $timeout(function() {
-					last = now;
-					callback.apply(context, args);
-				}, threshhold);
+				if (trailing) {
+					deferTimer = $timeout(function() {
+						last = now;
+						callback.apply(context, args);
+					}, threshhold);
+				} else {
+					deferTimer = $timeout(function() {}, threshhold);
+				}
 				return deferTimer;
 			} else {
 				last = now;

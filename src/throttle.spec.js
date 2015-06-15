@@ -73,12 +73,68 @@ describe("angular-throttle-debounce unit test", function() {
 		expect(typeof debounce).toEqual("function");
 	}));
 
-	it("test throttle function", function(done) {
+	it("test throttle function without trailing", function(done) {
 		var delay = 100;
 		var calls = [];
 		var fn = throttle(function(callid) {
 			calls.push(callid);
 		}, delay);
+
+		expect(calls.length).toEqual(0);
+		fn(1).finally(function() {
+			expect(calls.length).toEqual(1);
+		});
+		expect(calls.length).toEqual(1);
+		fn(2).finally(function() {
+			expect(calls.length).toEqual(1);
+		});
+		expect(calls.length).toEqual(1);
+		fn(3).finally(function() {
+			expect(calls.length).toEqual(1);
+		});
+		expect(calls.length).toEqual(1);
+
+		setTimeout(function() {
+			expect(calls.length).toEqual(1);
+			fn(4).finally(function() {
+				expect(calls.length).toEqual(1);
+			});
+			expect(calls.length).toEqual(1);
+			fn(5).finally(function(a, b) {
+				expect(calls.length >= 1).toBeTruthy();
+			});
+			expect(calls.length).toEqual(1);
+		}, delay * 0.75);
+		setTimeout(function() {
+			expect(calls.length).toEqual(1);
+			fn(6).finally(function() {
+				expect(calls.length >= 2).toBeTruthy();
+			});
+			expect(calls.length).toEqual(2);
+			fn(7).finally(function() {
+				expect(calls.length).toEqual(2);
+			});
+			expect(calls.length).toEqual(2);
+		}, delay * 1.25);
+		setTimeout(function() {
+			expect(calls.length).toEqual(2);
+		}, delay * 2);
+		setTimeout(function() {
+			expect(calls.length).toEqual(2);
+		}, delay * 3);
+		setTimeout(function() {
+			expect(calls).toEqual([1, 6]);
+		}, delay * 4);
+
+		setTimeout(done, delay * 4.5);
+	});
+
+	it("test throttle function with trailing", function(done) {
+		var delay = 100;
+		var calls = [];
+		var fn = throttle(function(callid) {
+			calls.push(callid);
+		}, delay, true);
 
 		expect(calls.length).toEqual(0);
 		fn(1).finally(function() {
