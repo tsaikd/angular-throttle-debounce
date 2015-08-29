@@ -51,7 +51,7 @@ angular
 				context = this;
 			$timeout.cancel(deferTimer);
 			deferTimer = $timeout(function() {
-				callback.apply(context, args);
+				return callback.apply(context, args);
 			}, delay);
 			return deferTimer;
 		};
