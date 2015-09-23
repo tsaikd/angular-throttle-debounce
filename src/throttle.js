@@ -1,3 +1,12 @@
+(function() {
+
+	function isPromiseLike(promise) {
+		return promise &&
+			angular.isFunction(promise.then) &&
+			angular.isFunction(promise.catch) &&
+			angular.isFunction(promise.finally);
+	}
+
 angular
 
 .module("angular-throttle-debounce", [])
@@ -61,14 +70,7 @@ angular
 .factory("singleton"
 	, [       "$q"
 	, function($q) {
-	return function(callback) {
-
-		function isPromiseLike(promise) {
-			return promise &&
-				angular.isFunction(promise.then) &&
-				angular.isFunction(promise.catch) &&
-				angular.isFunction(promise.finally);
-		}
+	return function(callback, forever) {
 
 		var promise = null;
 		return function() {
@@ -86,12 +88,14 @@ angular
 			var result = callback.apply(context, args);
 
 			if (!isPromiseLike(result)) {
-				return $q.reject(new Error("callback return must be promise"));
+				return $q.reject(new Error("callback return must be promise object"));
 			}
 
 			promise = $q.when(result)
 				.finally(function() {
-					promise = null;
+					if (forever !== true) {
+						promise = null;
+					}
 				});
 			return promise;
 		};
@@ -99,3 +103,5 @@ angular
 }])
 
 ;
+
+})();

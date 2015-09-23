@@ -309,4 +309,48 @@ describe("angular-throttle-debounce unit test", function() {
 		.finally(done);
 	});
 
+	it("test singleton forever function", function(done) {
+		var delay = 100;
+		var calls = [];
+		var fn = singleton(function(callid) {
+			return $timeout(function() {
+				calls.push(callid);
+			}, delay);
+		}, true);
+
+		$timeout(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(1).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(0);
+				fn(2).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(0);
+			}, delay * 0);
+		}, 0)
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(3).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(JSON.stringify(calls)).toEqual(JSON.stringify([1]));
+			}, delay * 1.5);
+		})
+		.finally(done);
+	});
+
 });
