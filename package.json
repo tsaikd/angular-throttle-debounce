@@ -1,6 +1,6 @@
 {
   "name": "angular-throttle-debounce",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "AngularJS throttle debounce module",
   "devDependencies": {
     "bower": "^1.5.2",
