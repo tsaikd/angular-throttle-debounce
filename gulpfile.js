@@ -84,21 +84,24 @@ gulp.task("bower.json", function() {
 		.pipe(gulp.dest("./"));
 });
 
-gulp.task("update-npm", function(done) {
-	var cmd = "sh -c './node_modules/npm-check-updates/bin/npm-check-updates -u'";
-	$.run(cmd).exec().on("end", done);
+gulp.task("update-npm", function() {
+	var cmd = "./node_modules/npm-check-updates/bin/npm-check-updates -a";
+	$.util.log(cmd);
+	return $.shell.task(cmd + " < package.json")();
 });
 
-gulp.task("update-bower", function(done) {
+gulp.task("update-bower", function() {
 	var bowerjson = require("./bower.json");
 	var deps = [];
 	var i, cmd;
 
 	for (i in bowerjson.dependencies) {
-		deps.push(i);
+		if (i[0] == "~") {
+			deps.push(i);
+		}
 	}
 	cmd = "bower install --save --force-latest " + deps.join(" ");
-	$.run(cmd).exec().on("end", done);
+	return $.shell.task(cmd)();
 });
 
 gulp.task("watch", function() {
