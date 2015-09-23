@@ -58,4 +58,44 @@ angular
 	};
 }])
 
+.factory("singleton"
+	, [       "$q"
+	, function($q) {
+	return function(callback) {
+
+		function isPromiseLike(promise) {
+			return promise &&
+				angular.isFunction(promise.then) &&
+				angular.isFunction(promise.catch) &&
+				angular.isFunction(promise.finally);
+		}
+
+		var promise = null;
+		return function() {
+			var args = arguments;
+			var context = this;
+
+			if (promise) {
+				return promise;
+			}
+
+			if (!angular.isFunction(callback)) {
+				return $q.reject(new Error("callback must be function"));
+			}
+
+			var result = callback.apply(context, args);
+
+			if (!isPromiseLike(result)) {
+				return $q.reject(new Error("callback return must be promise"));
+			}
+
+			promise = $q.when(result)
+				.finally(function() {
+					promise = null;
+				});
+			return promise;
+		};
+	};
+}])
+
 ;

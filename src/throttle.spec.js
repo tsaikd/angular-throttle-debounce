@@ -2,6 +2,7 @@ describe("angular-throttle-debounce unit test", function() {
 
 	var throttle,
 		debounce,
+		singleton,
 		$timeout,
 		$browser,
 		$log;
@@ -69,10 +70,13 @@ describe("angular-throttle-debounce unit test", function() {
 		$timeout = $injector.get("$timeout");
 		throttle = $injector.get("throttle");
 		debounce = $injector.get("debounce");
+		singleton = $injector.get("singleton");
 		expect(throttle).toBeDefined();
 		expect(debounce).toBeDefined();
+		expect(singleton).toBeDefined();
 		expect(typeof throttle).toEqual("function");
 		expect(typeof debounce).toEqual("function");
+		expect(typeof singleton).toEqual("function");
 	}));
 
 	it("test throttle function without trailing", function(done) {
@@ -256,6 +260,50 @@ describe("angular-throttle-debounce unit test", function() {
 		.then(function() {
 			return $timeout(function() {
 				expect(JSON.stringify(calls)).toEqual(JSON.stringify([4, 5]));
+			}, delay * 1.5);
+		})
+		.finally(done);
+	});
+
+	it("test singleton function", function(done) {
+		var delay = 100;
+		var calls = [];
+		var fn = singleton(function(callid) {
+			return $timeout(function() {
+				calls.push(callid);
+			}, delay);
+		});
+
+		$timeout(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(0);
+				fn(1).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(0);
+				fn(2).finally(function() {
+					expect(calls.length).toEqual(1);
+				});
+				expect(calls.length).toEqual(0);
+			}, delay * 0);
+		}, 0)
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(1);
+				fn(3).finally(function() {
+					expect(calls.length).toEqual(2);
+				});
+				expect(calls.length).toEqual(1);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(calls.length).toEqual(2);
+			}, delay * 1);
+		})
+		.then(function() {
+			return $timeout(function() {
+				expect(JSON.stringify(calls)).toEqual(JSON.stringify([1, 3]));
 			}, delay * 1.5);
 		})
 		.finally(done);
