@@ -15,7 +15,7 @@
     "angular-mocks": ">=1.3"
   },
   "main": [
-    "dist/angular-throttle.min.js"
+    "dist/angular-throttle-debounce.min.js"
   ],
   "ignore": [
     "node_modules",
